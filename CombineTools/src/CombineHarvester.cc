@@ -673,10 +673,10 @@ std::shared_ptr<RooWorkspace> CombineHarvester::SetupWorkspace(
     // bugs
     if (GetFlag("workspaces-use-clone")) {
       wspaces_[std::string(ws.GetName())] = std::shared_ptr<RooWorkspace>(
-          reinterpret_cast<RooWorkspace*>(ws.Clone()));      
+          reinterpret_cast<RooWorkspace*>(ws.Clone()));
     } else {
       wspaces_[std::string(ws.GetName())] =
-          std::make_shared<RooWorkspace>(RooWorkspace(ws));  
+          std::make_shared<RooWorkspace>(RooWorkspace(ws));
     }
     return wspaces_.at(ws.GetName());
   }
@@ -712,7 +712,7 @@ std::shared_ptr<RooWorkspace> CombineHarvester::SetupWorkspace(
   std::shared_ptr<RooWorkspace> new_wsp;
   if (GetFlag("workspaces-use-clone")) {
     new_wsp = std::shared_ptr<RooWorkspace>(
-        reinterpret_cast<RooWorkspace*>(ws.Clone(new_name.c_str())));    
+        reinterpret_cast<RooWorkspace*>(ws.Clone(new_name.c_str())));
   } else {
     new_wsp = std::make_shared<RooWorkspace>(RooWorkspace(ws));
   }
@@ -738,7 +738,7 @@ void CombineHarvester::ImportParameters(RooArgSet *vars) {
         if ((y->hasError() || y->hasAsymError()) &&
             flags_["import-parameter-err"]) {
           par.set_err_d(y->getErrorLo());
-          par.set_err_u(y->getErrorHi());          
+          par.set_err_u(y->getErrorHi());
         } else {
           par.set_err_d(0.);
           par.set_err_u(0.);
@@ -870,6 +870,10 @@ void CombineHarvester::SetAutoMCStats(CombineHarvester &target, double thresh, b
   }
 }
 
+void CombineHarvester::SetAutoMCStatsByBin(std::string const& binName, double thresh, bool sig, int mode) {
+  auto_stats_settings_[binName] = AutoMCStatsSettings(thresh, sig, mode);
+}
+
 void CombineHarvester::RenameAutoMCStatsBin(std::string const& oldname, std::string const& newname) {
   auto it = auto_stats_settings_.find(oldname);
   if (it != auto_stats_settings_.end()) {
@@ -884,6 +888,30 @@ std::set<std::string> CombineHarvester::GetAutoMCStatsBins() const {
     result.insert(it.first);
   }
   return result;
+}
+
+double CombineHarvester::GetAutoMCStatsEventThreshold(std::string const& binName) const {
+  auto it = auto_stats_settings_.find(binName);
+  if (it == auto_stats_settings_.end()) {
+    throw std::runtime_error(FNERROR("AutoMCStats not configured for bin " + binName));
+  }
+  return it->second.event_threshold;
+}
+
+bool CombineHarvester::GetAutoMCStatsIncludeSignal(std::string const& binName) const {
+  auto it = auto_stats_settings_.find(binName);
+  if (it == auto_stats_settings_.end()) {
+    throw std::runtime_error(FNERROR("AutoMCStats not configured for bin " + binName));
+  }
+  return it->second.include_signal;
+}
+
+int CombineHarvester::GetAutoMCStatsHistMode(std::string const& binName) const {
+  auto it = auto_stats_settings_.find(binName);
+  if (it == auto_stats_settings_.end()) {
+    throw std::runtime_error(FNERROR("AutoMCStats not configured for bin " + binName));
+  }
+  return it->second.hist_mode;
 }
 
 void CombineHarvester::AddExtArgValue(std::string const& name, double const& value) {

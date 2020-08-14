@@ -191,7 +191,7 @@ class CombineHarvester {
    *
    * This method will loop through all ch::Observation, ch::Process and
    * ch::Systematic entries and call the user-supplied function `func`. The
-   * return value is then inserted into the set. 
+   * return value is then inserted into the set.
    *
    * @tparam T A function (or other callable) that must have a single
    * `ch::Object const*` argument.
@@ -425,7 +425,7 @@ class CombineHarvester {
 
   /**
    * Rename a systematic from 'old_name' to 'new_name' and add a parameter
-   * 'new_name' to CH instance 'target' if that parameter doesn't exist yet. 
+   * 'new_name' to CH instance 'target' if that parameter doesn't exist yet.
    * Usage similar to AddSyst()
    */
   void RenameSystematic(CombineHarvester& target, std::string const& old_name, std::string const& new_name);
@@ -460,8 +460,12 @@ class CombineHarvester {
   /**@}*/
 
   void SetAutoMCStats(CombineHarvester &target, double thresh, bool sig=false, int mode=1);
+  void SetAutoMCStatsByBin(std::string const& binName, double thresh, bool sig=false, int mode=1);
   void RenameAutoMCStatsBin(std::string const& oldname, std::string const& newname);
   std::set<std::string> GetAutoMCStatsBins() const;
+  double GetAutoMCStatsEventThreshold(std::string const& binName) const;
+  bool GetAutoMCStatsIncludeSignal(std::string const& binName) const;
+  int GetAutoMCStatsHistMode(std::string const& binName) const;
 
   void AddExtArgValue(std::string const& name, double const& value);
  private:

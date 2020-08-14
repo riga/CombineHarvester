@@ -200,6 +200,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(defaults_syst_name, syst_name, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(defaults_syst_type, syst_type, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(defaults_process_rgx, process_rgx, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(defaults_SetAutoMCStats, SetAutoMCStats, 2, 4)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(defaults_SetAutoMCStatsByBin, SetAutoMCStatsByBin, 2, 4)
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(defaults_MassesFromRange, ch::MassesFromRange, 1, 2)
 BOOST_PYTHON_FUNCTION_OVERLOADS(defaults_ValsFromRange, ch::ValsFromRange, 1, 2)
@@ -231,7 +232,7 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
 
   py::to_python_converter<RooWorkspace,
                           convert_cpp_root_to_py_root<RooWorkspace>>();
-  
+
   // Define converters from python --> C++
   convert_py_seq_to_cpp_vector<std::string>();
   convert_py_tup_to_cpp_pair<int, std::string>();
@@ -361,8 +362,12 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
       .def("AddWorkspace", &CombineHarvester::AddWorkspace)
       .def("ExtractPdfs", &CombineHarvester::ExtractPdfs)
       .def("SetAutoMCStats", &CombineHarvester::SetAutoMCStats, defaults_SetAutoMCStats())
+      .def("SetAutoMCStatsByBin", &CombineHarvester::SetAutoMCStatsByBin, defaults_SetAutoMCStatsByBin())
       .def("RenameAutoMCStatsBin", &CombineHarvester::RenameAutoMCStatsBin)
       .def("GetAutoMCStatsBins", &CombineHarvester::GetAutoMCStatsBins)
+      .def("GetAutoMCStatsEventThreshold", &CombineHarvester::GetAutoMCStatsEventThreshold)
+      .def("GetAutoMCStatsIncludeSignal", &CombineHarvester::GetAutoMCStatsIncludeSignal)
+      .def("GetAutoMCStatsHistMode", &CombineHarvester::GetAutoMCStatsHistMode)
       .def("AddExtArgValue", &CombineHarvester::AddExtArgValue)
       ;
 
@@ -486,7 +491,7 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
       .def("SetPoissonErrors", &BinByBinFactory::SetPoissonErrors,
            py::return_internal_reference<>())
     ;
-    
+
     py::class_<AutoRebin>("AutoRebin")
       .def("Rebin", &AutoRebin::Rebin)
       .def("SetVerbosity", &AutoRebin::SetVerbosity,
