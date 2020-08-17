@@ -403,8 +403,10 @@ void CombineHarvester::LoadShapes(Process* entry,
 
     if (flags_.at("check-negative-bins-on-import")) {
       if (HasNegativeBins(h.get())) {
-        LOGLINE(log(), "Warning: process shape has negative bins");
-        log() << Process::PrintHeader << *entry << "\n";
+        if (verbosity_ >= 1) {
+          LOGLINE(log(), "Warning: process shape has negative bins");
+          log() << Process::PrintHeader << *entry << "\n";
+        }
         if (flags_.at("zero-negative-bins-on-import")) {
           ZeroNegativeBins(h.get());
         }
@@ -434,8 +436,10 @@ void CombineHarvester::LoadShapes(Process* entry,
       entry->set_pdf(pdf);
     } else { // Pre-condition #3
       if (flags_.at("allow-missing-shapes")) {
-        LOGLINE(log(), "Warning, shape missing:");
-        log() << Process::PrintHeader << *entry << "\n";
+        if (verbosity_ >= 1) {
+          LOGLINE(log(), "Warning, shape missing:");
+          log() << Process::PrintHeader << *entry << "\n";
+        }
       } else {
         throw std::runtime_error(FNERROR("RooAbsPdf not found in workspace"));
       }
@@ -548,24 +552,30 @@ void CombineHarvester::LoadShapes(Systematic* entry,
 
     if (flags_.at("check-negative-bins-on-import")) {
       if (HasNegativeBins(h.get())) {
-        LOGLINE(log(), "Warning: Systematic shape has negative bins");
-        log() << Systematic::PrintHeader << *entry << "\n";
+        if (verbosity_ >= 1) {
+          LOGLINE(log(), "Warning: Systematic shape has negative bins");
+          log() << Systematic::PrintHeader << *entry << "\n";
+        }
         if (flags_.at("zero-negative-bins-on-import")) {
           ZeroNegativeBins(h.get());
         }
       }
 
       if (HasNegativeBins(h_u.get())) {
-        LOGLINE(log(), "Warning: Systematic shape_u has negative bins");
-        log() << Systematic::PrintHeader << *entry << "\n";
+        if (verbosity_ >= 1) {
+          LOGLINE(log(), "Warning: Systematic shape_u has negative bins");
+          log() << Systematic::PrintHeader << *entry << "\n";
+        }
         if (flags_.at("zero-negative-bins-on-import")) {
           ZeroNegativeBins(h_u.get());
         }
       }
 
       if (HasNegativeBins(h_d.get())) {
-        LOGLINE(log(), "Warning: Systematic shape_d has negative bins");
-        log() << Systematic::PrintHeader << *entry << "\n";
+        if (verbosity_ >= 1) {
+          LOGLINE(log(), "Warning: Systematic shape_d has negative bins");
+          log() << Systematic::PrintHeader << *entry << "\n";
+        }
         if (flags_.at("zero-negative-bins-on-import")) {
           ZeroNegativeBins(h_d.get());
         }
@@ -583,8 +593,10 @@ void CombineHarvester::LoadShapes(Systematic* entry,
         dynamic_cast<RooDataHist*>(mapping.sys_ws->data(p_s_lo.c_str()));
     if (!h || !h_u || !h_d) {
       if (flags_.at("allow-missing-shapes")) {
-        LOGLINE(log(), "Warning, shape missing:");
-        log() << Systematic::PrintHeader << *entry << "\n";
+        if (verbosity_ >= 1) {
+          LOGLINE(log(), "Warning, shape missing:");
+          log() << Systematic::PrintHeader << *entry << "\n";
+        }
       } else {
         throw std::runtime_error(
             FNERROR("All shapes must be of type RooDataHist"));
