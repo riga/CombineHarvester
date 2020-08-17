@@ -166,6 +166,9 @@ void (Process::*Overload_Proc_set_shape)(
 void (Systematic::*Overload_Syst_set_shapes)(
     TH1 const&, TH1 const&, TH1 const&) = &Systematic::set_shapes;
 
+std::set<std::string> (Parameter::*Overload_groups)(
+    void) const = &Parameter::groups;
+
 void (*Overload1_ValidateShapeUncertaintyDirection)(
     CombineHarvester&) = ch::ValidateShapeUncertaintyDirection;
 
@@ -456,6 +459,7 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
       .def("range_d", &Parameter::range_d)
       .def("set_frozen", &Parameter::set_frozen)
       .def("frozen", &Parameter::frozen)
+      .def("groups", Overload_groups)
     ;
 
     py::class_<CardWriter>("CardWriter", py::init<std::string, std::string>())

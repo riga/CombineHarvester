@@ -52,6 +52,7 @@ class Parameter {
 
   std::vector<RooRealVar *> & vars() { return vars_; }
   std::set<std::string> & groups() { return groups_; }
+  std::set<std::string> groups() const { return groups_; }
 
   friend std::ostream& operator<< (std::ostream &out, Parameter &val);
   static std::ostream& PrintHeader(std::ostream &out);
