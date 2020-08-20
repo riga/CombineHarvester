@@ -832,10 +832,10 @@ def main():
         default=None, help="threshold, signal flag (usually 0) and hist mode (usually 1) for the "
         "autoMCStats setting; default: setting of the first datacard")
     parser.add_argument("--shape-patterns", "-s", type=csv, nargs="+", metavar="PROCESS,NOM_PATTERN"
-        "(,SYST_PATTERN)", default=["*,$BIN/$PROCESS,$BIN/$PROCESS_$SYSTEMATIC"], help="patterns "
-        "for saving stacked shapes; the systematic pattern is optional; per process the most "
-        "specific pattern is used; accepts variables %%BIN, %%PROCESS, %%MASS and %%SYSTEMATIC; "
-        "default: *,$BIN/$PROCESS,$BIN/$PROCESS_$SYSTEMATIC")
+        "(,SYST_PATTERN)", default=[["*", "$BIN/$PROCESS", "$BIN/$PROCESS_$SYSTEMATIC"]],
+        help="patterns for saving stacked shapes; the systematic pattern is optional; per process "
+        "the most specific pattern is used; accepts variables %%BIN, %%PROCESS, %%MASS and "
+        "%%SYSTEMATIC; default: *,$BIN/$PROCESS,$BIN/$PROCESS_$SYSTEMATIC")
     parser.add_argument("--rate-digits", type=int, default=5, help="number of digits of combined "
         "rates, default: 5")
     parser.add_argument("--syst-digits", type=int, default=3, help="number of digits of combined "
