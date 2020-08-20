@@ -146,7 +146,8 @@ void CombineHarvester::RenameSystematic(CombineHarvester &target, std::string co
 
 void CombineHarvester::ExtractShapes(std::string const& file,
                                      std::string const& rule,
-                                     std::string const& syst_rule) {
+                                     std::string const& syst_rule,
+                                     bool skip_data) {
   std::vector<HistMapping> mapping(1);
   mapping[0].process = "*";
   mapping[0].category = "*";
@@ -156,9 +157,11 @@ void CombineHarvester::ExtractShapes(std::string const& file,
 
   // Note that these LoadShapes calls will fail if we encounter
   // any object that already has shapes
-  for (unsigned  i = 0; i < obs_.size(); ++i) {
-    if (obs_[i]->shape() || obs_[i]->data()) continue;
-    LoadShapes(obs_[i].get(), mapping);
+  if (!skip_data) {
+    for (unsigned  i = 0; i < obs_.size(); ++i) {
+      if (obs_[i]->shape() || obs_[i]->data()) continue;
+      LoadShapes(obs_[i].get(), mapping);
+    }
   }
   for (unsigned  i = 0; i < procs_.size(); ++i) {
     if (procs_[i]->shape() || procs_[i]->pdf()) continue;

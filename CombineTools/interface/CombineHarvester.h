@@ -412,7 +412,7 @@ class CombineHarvester {
                std::string const& type, Map const& valmap);
 
   void ExtractShapes(std::string const& file, std::string const& rule,
-                     std::string const& syst_rule);
+                     std::string const& syst_rule, bool skip_data = false);
   void ExtractPdfs(CombineHarvester& target, std::string const& ws_name,
                    std::string const& rule, std::string norm_rule = "");
   void ExtractData(std::string const& ws_name, std::string const& rule);
