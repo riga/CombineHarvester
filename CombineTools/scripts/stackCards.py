@@ -21,6 +21,7 @@ import os
 import sys
 import re
 import tempfile
+import shutil
 from glob import glob
 from fnmatch import fnmatch
 from collections import OrderedDict
@@ -62,7 +63,7 @@ def lazy_imports():
 
 def stack_cards(input_cards, output_card, output_shapes, analysis_name="analysis", era="13TeV",
         mass="125", channel_name="channel", bin_name=None, auto_mc_stats=None, shape_patterns=None,
-        rate_digits=5, syst_digits=3, output_directory="./"):
+        no_shapes=False, rate_digits=5, syst_digits=3, output_directory="./"):
     """
     Actual function that performs the datacard stacking. For more information on arguments, run this
     script with *--help* or check out the setup of the argument parser below.
@@ -238,7 +239,7 @@ def stack_cards(input_cards, output_card, output_shapes, analysis_name="analysis
                 raise Exception("type '{}' of systematic '{}' is not supported, supported ones "
                     "are: {},shape*".format(unique_types[0], syst_name, ",".join(rate_syst_types)))
 
-    # check that either all mc stats are set or none, and optionally set defaults
+    # check that either all or none mc stats are set, and optionally set defaults
     if all_auto_mc_stats.count(None) == 0:
         # all datacards have autoMCStats settings
         if not auto_mc_stats:
@@ -258,7 +259,9 @@ def stack_cards(input_cards, output_card, output_shapes, analysis_name="analysis
     # stack shape files
     #
 
-    tmp_shape_file = stack_shapes(input_data, syst_map, shape_patterns, bin_name, mass=mass)
+    tmp_shape_file = None
+    if not no_shapes:
+        tmp_shape_file = stack_shapes(input_data, syst_map, shape_patterns, bin_name, mass=mass)
 
     #
     # create the output datacard
@@ -301,6 +304,10 @@ def stack_cards(input_cards, output_card, output_shapes, analysis_name="analysis
             first_data_key = set_data_keys[0]
             first_syst = process_data[first_data_key]
             syst_type = first_syst.type()
+
+            # skip shapes if requested
+            if no_shapes and syst_type.startswith("shape"):
+                continue
 
             # get the systematic scale (a 2-tuple with down/up factors)
             if syst_type in ["lnN", "lnU"]:
@@ -379,9 +386,16 @@ def stack_cards(input_cards, output_card, output_shapes, analysis_name="analysis
         out_cb.SetGroup(group_name, parameter_names)
 
     # write it
+    # in case shapes are skipped, trick the card writer by using a temporary directory
+    tmp_dir = tempfile.mkdtemp() if no_shapes else ""
     output_directory = os.path.expandvars(os.path.expanduser(output_directory))
-    writer = ch.CardWriter(os.path.join("$TAG", output_card), os.path.join("$TAG", output_shapes))
+    writer = ch.CardWriter(os.path.join("$TAG", output_card),
+        os.path.join(tmp_dir, "$TAG", output_shapes))
     writer.WriteCards(output_directory, out_cb)
+
+    # delete the tmp_dir
+    if tmp_dir and os.path.exists(tmp_dir):
+        shutil.rmtree(tmp_dir)
 
 
 def stack_shapes(input_data, syst_map, shape_patterns, bin_name, mass="125"):
@@ -840,6 +854,8 @@ def main():
         help="patterns for saving stacked shapes; the systematic pattern is optional; per process "
         "the most specific pattern is used; accepts variables %%BIN, %%PROCESS, %%MASS and "
         "%%SYSTEMATIC; default: *,$BIN/$PROCESS,$BIN/$PROCESS_$SYSTEMATIC")
+    parser.add_argument("--no-shapes", "-n", action="store_true", help="do not stack shapes but "
+        "only bin-wise rates")
     parser.add_argument("--rate-digits", type=int, default=5, help="number of digits of combined "
         "rates, default: 5")
     parser.add_argument("--syst-digits", type=int, default=3, help="number of digits of combined "
@@ -850,7 +866,8 @@ def main():
     stack_cards(args.inputs, args.outputs[0], args.outputs[1], analysis_name=args.analysis,
         era=args.era, mass=args.mass, channel_name=args.channel, bin_name=args.bin,
         auto_mc_stats=args.auto_mc_stats, shape_patterns=args.shape_patterns,
-        rate_digits=args.rate_digits, syst_digits=args.syst_digits, output_directory=args.directory)
+        no_shapes=args.no_shapes, rate_digits=args.rate_digits, syst_digits=args.syst_digits,
+        output_directory=args.directory)
 
 
 # entry hook
