@@ -151,7 +151,11 @@ def stack_cards(input_cards, output_card, output_shapes, analysis_name="analysis
         # store parameters referred to by systematics
         for syst in data.systematics:
             if syst.name() not in data.parameters:
-                data.parameters[syst.name()] = cb.GetParameter(syst.name())
+                parameter = cb.GetParameter(syst.name())
+                if not parameter:
+                    print("WARNING: no parameter found for systematic '{}'".format(syst.name()))
+                else:
+                    data.parameters[syst.name()] = parameter
 
         # save auto mc stats info
         if data.bin_name in cb.GetAutoMCStatsBins():
